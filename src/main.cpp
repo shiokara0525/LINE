@@ -1,16 +1,15 @@
 #include <Arduino.h>
 
 int LED = 13;
-int FD[24] = {};
+int FD[24] = {69,22,24,23,25,26,27,28,29,11,12,14,56,57,58,59,60,61,62,63,64,65,66,67};
 int com = 2;
-int th = 20;
+int th = 200;
 
 void setup() {
   Serial.begin(9600);
-  DDRK = B00000010;
-  DDRA = B00000000;
-  DDRJ = B11110001;
-  DDRF = B11000000;
+  for(int i = 0; i < 24; i++){
+    pinMode(FD[i],INPUT);
+  }
   pinMode(LED,OUTPUT);
   pinMode(com,OUTPUT);
   analogWrite(com,th);
@@ -20,10 +19,6 @@ void setup() {
 void loop() {
   uint8_t L_bit[24];
   long L_val[24];
-  for(int i = 0; i < 24; i++){
-    L_val[i] = 0;
-  }
-
   L_bit[0] = PINK & _BV(7);
   L_bit[1] = PINA & _BV(0);
   L_bit[2] = PINA & _BV(1);
@@ -48,15 +43,16 @@ void loop() {
   L_bit[21] = PINK & _BV(3);
   L_bit[22] = PINK & _BV(4);
   L_bit[23] = PINK & _BV(5);
-  
+
   for(int i = 0; i < 24; i++){
     if(L_bit[i] != 0){
-      L_val[i] ++;
+      L_val[i] = 1;
+    }
+    else{
+      L_val[i] = 0;
     }
   }
-  
 
- 
   for(int i = 0; i < 24; i++){
     Serial.print(L_val[i]);
     Serial.print(" ");
