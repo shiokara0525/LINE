@@ -6,19 +6,22 @@
 int LED = 13;
 int FD[24] = {69,22,24,23,25,26,27,28,29,11,12,14,56,57,58,59,60,61,62,63,64,65,66,67};
 int com = 2;
-int th = 220;
+int th = 175;
 
-int dis_X;
-int dis_Y;
+float dis_X;
+float dis_Y;
 uint8_t num;
 int LINE_on;
-
+double ele_X[27]; //ラインセンサのX座標
+double ele_Y[27]; //ラインセンサのY座標
 void getLine();
 
 void setup() {
   Serial.begin(9600);
-  Serial2.begin(9600);
+  Serial2.begin(57600);
   for(int i = 0; i < 24; i++){
+    ele_Y[i] = sin(radians(15 * i));
+    ele_X[i] = cos(radians(15 * i));
     pinMode(FD[i],INPUT);
   }
   pinMode(LED,OUTPUT);
@@ -31,27 +34,38 @@ void loop() {
   getLine();
 
   byte send[7];
-  send[0] = 0x26;
-  send[1] = byte(dis_X >> 8);
-  send[2] = byte(dis_X & 0xFF);
-  send[3] = byte(dis_Y >> 8);
-  send[4] = byte(dis_Y & 0xFF);
+  int vec[2] = {int(dis_X * 100),int(dis_Y * 100)};
+
+  // Serial.print(vec[0]);
+  // Serial.print(" ");
+  // Serial.print(vec[1]);
+  // Serial.print(" ang : ");
+  // Serial.print(degrees(atan2(vec[1],vec[0])));
+
+  send[0] = 38;
+  send[1] = byte(vec[0] >> 8);
+  send[2] = byte(vec[0] & 0xFF);
+  send[3] = byte(vec[1] >> 8);
+  send[4] = byte(vec[1] & 0xFF);
   send[5] = num;
-  send[6] = 0x25;
+  send[6] = 37;
 
   Serial2.write(send,7);
+  // for(int i = 0; i < 7; i++){
+  //   Serial.print(i);
+  //   Serial.print(" ");
+  //   Serial.print(send[i]);
+  //   Serial.print(" | ");
+  // }
+  Serial.println();
 }
 
 
 void getLine(){
   float X = 0;
   float Y = 0;
-  double dis; //ラインのベクトルの長さ
-  double ang; //ラインの和のベクトルの角度
-  double ele_X[27]; //ラインセンサのX座標
-  double ele_Y[27]; //ラインセンサのY座標
+
   int data_on[24];
-  int Lnum = 0;
   int flag = 0;
   int block_first[Long];
   int block_last[Long];
@@ -92,8 +106,13 @@ void getLine(){
     else{
       data_on[i] = 0;
     }
+    Serial.print(data_on[i]);
+    Serial.print(" ");
   }
-    for(int i = 0; i < 24; i++){
+  for(int i = 0; i < 24; i++){
+    if((2 <= i && i <= 5) || (18 <= i && i <= 22)){
+      continue;
+    }
     if(flag == 0){
       if(data_on[i] == 1){
         block_num++;
@@ -133,8 +152,6 @@ void getLine(){
   Y /= block_num;
   dis_X = X;
   dis_Y = Y;
-  dis = sqrt(X*X + Y*Y);
-  ang = degrees(atan2(Y,X));
   num = block_num;
 
   if(block_num == 0){
