@@ -11,6 +11,7 @@ int th = 175;
 float dis_X;
 float dis_Y;
 uint8_t num;
+byte send[7];
 int LINE_on;
 double ele_X[27]; //ラインセンサのX座標
 double ele_Y[27]; //ラインセンサのY座標
@@ -33,7 +34,6 @@ void setup() {
 void loop() {
   getLine();
 
-  byte send[7];
   int vec[2] = {int(dis_X * 100),int(dis_Y * 100)};
 
   // Serial.print(vec[0]);
@@ -51,13 +51,6 @@ void loop() {
   send[6] = 37;
 
   Serial2.write(send,7);
-  // for(int i = 0; i < 7; i++){
-  //   Serial.print(i);
-  //   Serial.print(" ");
-  //   Serial.print(send[i]);
-  //   Serial.print(" | ");
-  // }
-  Serial.println();
 }
 
 
@@ -109,8 +102,9 @@ void getLine(){
     Serial.print(data_on[i]);
     Serial.print(" ");
   }
+  Serial.println();
   for(int i = 0; i < 24; i++){
-    if((2 <= i && i <= 5) || (18 <= i && i <= 22)){
+    if((1 <= i && i <= 5) || (i == 18)){
       continue;
     }
     if(flag == 0){
