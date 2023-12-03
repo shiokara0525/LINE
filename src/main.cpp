@@ -42,6 +42,8 @@ void loop() {
   // Serial.print(" ang : ");
   // Serial.print(degrees(atan2(vec[1],vec[0])));
 
+  // Serial.println();
+
   send[0] = 38;
   send[1] = byte(vec[0] >> 8);
   send[2] = byte(vec[0] & 0xFF);
@@ -58,7 +60,7 @@ void getLine(){
   float X = 0;
   float Y = 0;
 
-  int data_on[24];
+  int data_on[26];
   int flag = 0;
   int block_first[Long];
   int block_last[Long];
@@ -66,7 +68,7 @@ void getLine(){
   float block_X[Long];
   float block_Y[Long];
 
-  uint8_t L_bit[24];
+  uint8_t L_bit[26];
   L_bit[0] = PINK & _BV(7);
   L_bit[1] = PINA & _BV(0);
   L_bit[2] = PINA & _BV(1);
@@ -91,20 +93,21 @@ void getLine(){
   L_bit[21] = PINK & _BV(3);
   L_bit[22] = PINK & _BV(4);
   L_bit[23] = PINK & _BV(5);
+  L_bit[24] = PINF & _BV(0);
+  L_bit[25] = PINJ & _BV(3);
 
-  for(int i = 0; i < 24; i++){
+  for(int i = 0; i < 26; i++){
     if(L_bit[i] != 0){
       data_on[i] = 1;
     }
     else{
       data_on[i] = 0;
     }
-    Serial.print(data_on[i]);
-    Serial.print(" ");
+    // Serial.print(data_on[i]);
+    // Serial.print(" ");
   }
-  Serial.println();
   for(int i = 0; i < 24; i++){
-    if((1 <= i && i <= 5) || (i == 18)){
+    if(i == 7 || i == 8 | i == 19 | i == 22){
       continue;
     }
     if(flag == 0){
