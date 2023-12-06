@@ -4,9 +4,10 @@
 
 
 int LED = 13;
+int LED_L = 5;
 int FD[24] = {69,22,24,23,25,26,27,28,29,11,12,14,56,57,58,59,60,61,62,63,64,65,66,67};
 int com = 2;
-int th = 175;
+int th = 40;
 
 float dis_X;
 float dis_Y;
@@ -20,6 +21,7 @@ void getLine();
 void setup() {
   Serial.begin(9600);
   Serial2.begin(57600);
+  pinMode(LED_L,OUTPUT);
   for(int i = 0; i < 24; i++){
     ele_Y[i] = sin(radians(15 * i));
     ele_X[i] = cos(radians(15 * i));
@@ -28,20 +30,20 @@ void setup() {
   pinMode(LED,OUTPUT);
   pinMode(com,OUTPUT);
   analogWrite(com,th);
+  digitalWrite(LED_L,HIGH);
 }
 
 
-void loop() {
+void loop() {  
   getLine();
-
   int vec[2] = {int(dis_X * 100),int(dis_Y * 100)};
 
+  // Serial.print(" | ");
   // Serial.print(vec[0]);
   // Serial.print(" ");
   // Serial.print(vec[1]);
   // Serial.print(" ang : ");
   // Serial.print(degrees(atan2(vec[1],vec[0])));
-
   // Serial.println();
 
   send[0] = 38;
@@ -107,7 +109,7 @@ void getLine(){
     // Serial.print(" ");
   }
   for(int i = 0; i < 24; i++){
-    if(i == 7 || i == 8 | i == 19 | i == 22){
+    if(i == 7 || i == 8 || i == 19 || i == 22){
       continue;
     }
     if(flag == 0){
@@ -150,6 +152,15 @@ void getLine(){
   dis_X = X;
   dis_Y = Y;
   num = block_num;
+
+  if(data_on[24] == 1){
+    X = 1;
+    Y = 0;
+  }
+  else if(data_on[25] == 1){
+    X = -1;
+    Y = 0;
+  }
 
   if(block_num == 0){
     LINE_on = 0;
