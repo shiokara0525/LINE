@@ -30,12 +30,13 @@ void setup() {
   pinMode(LED,OUTPUT);
   pinMode(com,OUTPUT);
   analogWrite(com,th);
-  digitalWrite(LED_L,HIGH);
 }
 
 
-void loop() {  
+void loop() {
+  digitalWrite(LED_L,HIGH);
   getLine();
+  digitalWrite(LED_L,LOW);
   int vec[2] = {int(dis_X * 100),int(dis_Y * 100)};
 
   // Serial.print(" | ");
