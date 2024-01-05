@@ -7,7 +7,7 @@ int LED = 13;
 int LED_L = 5;
 int FD[24] = {69,22,24,23,25,26,27,28,29,11,12,14,56,57,58,59,60,61,62,63,64,65,66,67};
 int com = 2;
-int th = 40;
+int th = 30;
 
 float dis_X;
 float dis_Y;
@@ -62,7 +62,7 @@ void getLine(){
   float X = 0;
   float Y = 0;
 
-  int data_on[26];
+  int data_on[27];
   int flag = 0;
   int block_first[Long];
   int block_last[Long];
@@ -70,7 +70,7 @@ void getLine(){
   float block_X[Long];
   float block_Y[Long];
 
-  uint8_t L_bit[26];
+  uint8_t L_bit[27];
   L_bit[0] = PINK & _BV(7);
   L_bit[1] = PINA & _BV(0);
   L_bit[2] = PINA & _BV(1);
@@ -97,8 +97,9 @@ void getLine(){
   L_bit[23] = PINK & _BV(5);
   L_bit[24] = PINF & _BV(0);
   L_bit[25] = PINJ & _BV(3);
+  L_bit[26] = PINK & _BV(6);
 
-  for(int i = 0; i < 26; i++){
+  for(int i = 0; i < 27; i++){
     if(L_bit[i] != 0){
       data_on[i] = 1;
     }
@@ -108,6 +109,13 @@ void getLine(){
     // Serial.print(data_on[i]);
     // Serial.print(" ");
   }
+  // Serial.print("左 : ");
+  // Serial.print(data_on[24]);
+  // Serial.print(" 右 : ");
+  // Serial.print(data_on[25]);
+  // Serial.print(" 後ろ : ");
+  // Serial.print(data_on[26]);
+  // Serial.println();
   for(int i = 0; i < 24; i++){
     if(i == 7 || i == 8 || i == 19 || i == 22){
       continue;
