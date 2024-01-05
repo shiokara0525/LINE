@@ -8,6 +8,7 @@ int LED_L = 5;
 int FD[24] = {69,22,24,23,25,26,27,28,29,11,12,14,56,57,58,59,60,61,62,63,64,65,66,67};
 int com = 2;
 int th = 30;
+int th = 45;
 
 float dis_X;
 float dis_Y;
@@ -34,8 +35,10 @@ void setup() {
 }
 
 
-void loop() {  
+void loop() {
+  digitalWrite(LED_L,HIGH);
   getLine();
+  digitalWrite(LED_L,LOW);
   int vec[2] = {int(dis_X * 100),int(dis_Y * 100)};
 
   // Serial.print(" | ");
@@ -117,9 +120,6 @@ void getLine(){
   // Serial.print(data_on[26]);
   // Serial.println();
   for(int i = 0; i < 24; i++){
-    if(i == 7 || i == 8 || i == 19 || i == 22){
-      continue;
-    }
     if(flag == 0){
       if(data_on[i] == 1){
         block_num++;
@@ -160,17 +160,20 @@ void getLine(){
   dis_X = X;
   dis_Y = Y;
   num = block_num;
-
-  if(data_on[24] == 1){
-    X = 1;
-    Y = 0;
+  if(num == 0){
+    if(data_on[24] == 1){
+      dis_Y = -1;
+      dis_X = 0;
+      num = 1;
+    }
+    else if(data_on[25] == 1){
+      dis_Y = 1;
+      dis_X = 0;
+      num = 1;
+    }
   }
-  else if(data_on[25] == 1){
-    X = -1;
-    Y = 0;
-  }
 
-  if(block_num == 0){
+  if(num == 0){
     LINE_on = 0;
   }
   else{
