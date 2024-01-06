@@ -7,13 +7,13 @@ int LED = 13;
 int LED_L = 5;
 int FD[24] = {69,22,24,23,25,26,27,28,29,11,12,14,56,57,58,59,60,61,62,63,64,65,66,67};
 int com = 2;
-int th = 30;
-int th = 45;
+int th = 50;
 
 float dis_X;
 float dis_Y;
 uint8_t num;
-byte send[7];
+byte send[8];
+uint8_t line_sub = 0;
 int LINE_on;
 double ele_X[27]; //ラインセンサのX座標
 double ele_Y[27]; //ラインセンサのY座標
@@ -55,9 +55,16 @@ void loop() {
   send[3] = byte(vec[1] >> 8);
   send[4] = byte(vec[1] & 0xFF);
   send[5] = num;
-  send[6] = 37;
+  send[6] = line_sub;
+  send[7] = 37;
+  if(num != 0){
+    digitalWrite(LED,HIGH);
+  }
+  else{
+    digitalWrite(LED,LOW);
+  }
 
-  Serial2.write(send,7);
+  Serial2.write(send,8);
 }
 
 
@@ -112,14 +119,18 @@ void getLine(){
     // Serial.print(data_on[i]);
     // Serial.print(" ");
   }
-  // Serial.print("左 : ");
+
+  // Serial.print(" 左 : ");
   // Serial.print(data_on[24]);
   // Serial.print(" 右 : ");
   // Serial.print(data_on[25]);
   // Serial.print(" 後ろ : ");
   // Serial.print(data_on[26]);
-  // Serial.println();
+  Serial.println();
   for(int i = 0; i < 24; i++){
+    if(3 <= i && i <= 6){
+      continue;
+    }
     if(flag == 0){
       if(data_on[i] == 1){
         block_num++;
@@ -160,23 +171,34 @@ void getLine(){
   dis_X = X;
   dis_Y = Y;
   num = block_num;
-  if(num == 0){
-    if(data_on[24] == 1){
-      dis_Y = -1;
-      dis_X = 0;
-      num = 1;
-    }
-    else if(data_on[25] == 1){
-      dis_Y = 1;
-      dis_X = 0;
-      num = 1;
-    }
-  }
+  // if(num == 0){
+  //   if(data_on[24] == 1){
+  //     dis_Y = -1;
+  //     dis_X = 0;
+  //     num = 1;
+  //   }
+  //   else if(data_on[25] == 1){
+  //     dis_Y = 1;
+  //     dis_X = 0;
+  //     num = 1;
+  //   }
+  // }
 
   if(num == 0){
     LINE_on = 0;
   }
   else{
     LINE_on = 1;
+  }
+  
+  line_sub = 0;
+  if(data_on[24] == 1){
+    line_sub += 1;
+  }
+  if(data_on[25] == 1){
+    line_sub += 2;
+  }
+  if(data_on[26] == 1){
+    line_sub += 4;
   }
 }
