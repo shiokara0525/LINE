@@ -7,13 +7,14 @@ int LED = 13;
 int LED_L = 5;
 int FD[24] = {69,22,24,23,25,26,27,28,29,11,12,14,56,57,58,59,60,61,62,63,64,65,66,67};
 int com = 2;
-int th = 30;
+int th = 22;
 
 float dis_X;
 float dis_Y;
 uint8_t num;
-byte send[8];
+byte send[6];
 uint8_t line_sub = 0;
+byte line_byte[4];
 int LINE_on;
 double ele_X[27]; //ラインセンサのX座標
 double ele_Y[27]; //ラインセンサのY座標
@@ -39,7 +40,6 @@ void loop() {
   digitalWrite(LED_L,HIGH);
   getLine();
   digitalWrite(LED_L,LOW);
-  int vec[2] = {int(dis_X * 100),int(dis_Y * 100)};
 
   // Serial.print(" | ");
   // Serial.print(vec[0]);
@@ -50,13 +50,11 @@ void loop() {
   // Serial.println();
 
   send[0] = 38;
-  send[1] = byte(vec[0] >> 8);
-  send[2] = byte(vec[0] & 0xFF);
-  send[3] = byte(vec[1] >> 8);
-  send[4] = byte(vec[1] & 0xFF);
-  send[5] = num;
-  send[6] = line_sub;
-  send[7] = 37;
+  send[1] = line_byte[0];
+  send[2] = line_byte[1];
+  send[3] = line_byte[2];
+  send[4] = line_byte[3];
+  send[5] = 37;
   if(num != 0){
     digitalWrite(LED,HIGH);
   }
@@ -64,21 +62,16 @@ void loop() {
     digitalWrite(LED,LOW);
   }
 
-  Serial2.write(send,8);
+  Serial2.write(send,6);
 }
 
 
 void getLine(){
-  float X = 0;
-  float Y = 0;
+  byte line_byte_[4] = {0,0,0,0};
+  uint8_t hoge[27];
+  num = 0;
 
   int data_on[27];
-  int flag = 0;
-  int block_first[Long];
-  int block_last[Long];
-  int block_num = -1;
-  float block_X[Long];
-  float block_Y[Long];
 
   uint8_t L_bit[27];
   L_bit[0] = PINK & _BV(7);
@@ -112,6 +105,9 @@ void getLine(){
   for(int i = 0; i < 27; i++){
     if(L_bit[i] != 0){
       data_on[i] = 1;
+      if(i < 24){
+        num++;
+      }
     }
     else{
       data_on[i] = 0;
@@ -120,81 +116,104 @@ void getLine(){
     // Serial.print(" ");
   }
 
+  line_byte_[0] = data_on[0] | data_on[1] << 1 | data_on[2] << 2 |data_on[3] << 3 | data_on[4] << 4 |data_on[5] << 5 |data_on[6] << 6 | data_on[7] << 7;
+  line_byte_[1] = data_on[8] | data_on[9] << 1 | data_on[10] << 2 | data_on[11] << 3 | data_on[12] << 4 | data_on[13] << 5 | data_on[14] << 6 | data_on[15] << 7;
+  line_byte_[2] = data_on[16] | data_on[17] << 1 | data_on[18] << 2 |data_on[19] << 3 | data_on[20] << 4 |data_on[21] << 5 |data_on[22] << 6 | data_on[23] << 7;
+  line_byte_[3] = data_on[24] | data_on[25] << 1 | data_on[26] << 2 | 0b00000000;
+
   // Serial.print(" 左 : ");
   // Serial.print(data_on[24]);
   // Serial.print(" 右 : ");
   // Serial.print(data_on[25]);
   // Serial.print(" 後ろ : ");
   // Serial.print(data_on[26]);
-  Serial.println();
-  for(int i = 0; i < 24; i++){
-    if(2 <= i && i <= 4){
-      continue;
-    }
-    if(flag == 0){
-      if(data_on[i] == 1){
-        block_num++;
-        block_first[block_num] = i;
-        flag = 1;
-      }
-    }
-    else{
-      if(data_on[i] == 0){
-        block_last[block_num] = i - 1;
-        flag = 0;
-      }
-    }
-
-    if(i == 23){
-      if(data_on[23] == 1 && data_on[0] == 1){
-        block_first[0] = block_first[block_num];
-        block_first[block_num] = 0;
-        block_num--;
-      }
-
-      if(data_on[23] == 1 && data_on[0] == 0){
-        block_last[block_num] = 23;
-      }
-    }
-  }
-
-  for(int i = 0; i <= block_num; i++){
-    block_X[i] = ele_X[block_first[i]] + ele_X[block_last[i]];
-    block_Y[i] = ele_Y[block_first[i]] + ele_Y[block_last[i]];
-    X += block_X[i];
-    Y += block_Y[i];
-  }
-  block_num++;
-
-  X /= block_num;
-  Y /= block_num;
-  dis_X = X;
-  dis_Y = Y;
-  num = block_num;
-  if(num == 0){
-    if(data_on[24] == 1 && data_on[25] == 1){
-      dis_Y = 0;
-      dis_X = 1;
-      num = 1;
-    }
-    else if(data_on[24] == 1){
-      dis_Y = -1;
-      dis_X = 0;
-      num = 1;
-    }
-    else if(data_on[25] == 1){
-      dis_Y = 1;
-      dis_X = 0;
-      num = 1;
-    }
-  }
-
-  if(num == 0){
-    LINE_on = 0;
-  }
-  else{
-    LINE_on = 1;
-  }
+  line_byte[0] = line_byte_[0];
+  line_byte[1] = line_byte_[1];
+  line_byte[2] = line_byte_[2];
+  line_byte[3] = line_byte_[3];
   
-  line_sub = 0;
+  for(int i = 0; i < 4; i++){
+    for(int j = 0; j < 8; j++){
+      hoge[i * 8 + j] = line_byte_[i] % 2;
+      line_byte_[i] /= 2;
+      if(i == 3 && 2 <= j){
+        break;
+      }
+    }
+  }
+
+  for(int i = 0; i < 27; i++){
+    Serial.print(hoge[i]);
+  }
+  Serial.println();
+  // for(int i = 0; i < 24; i++){
+  //   if(2 <= i && i <= 4){
+  //     continue;
+  //   }
+  //   if(flag == 0){
+  //     if(data_on[i] == 1){
+  //       block_num++;
+  //       block_first[block_num] = i;
+  //       flag = 1;
+  //     }
+  //   }
+  //   else{
+  //     if(data_on[i] == 0){
+  //       block_last[block_num] = i - 1;
+  //       flag = 0;
+  //     }
+  //   }
+
+  //   if(i == 23){
+  //     if(data_on[23] == 1 && data_on[0] == 1){
+  //       block_first[0] = block_first[block_num];
+  //       block_first[block_num] = 0;
+  //       block_num--;
+  //     }
+
+  //     if(data_on[23] == 1 && data_on[0] == 0){
+  //       block_last[block_num] = 23;
+  //     }
+  //   }
+  // }
+
+  // for(int i = 0; i <= block_num; i++){
+  //   block_X[i] = ele_X[block_first[i]] + ele_X[block_last[i]];
+  //   block_Y[i] = ele_Y[block_first[i]] + ele_Y[block_last[i]];
+  //   X += block_X[i];
+  //   Y += block_Y[i];
+  // }
+  // block_num++;
+
+  // X /= block_num;
+  // Y /= block_num;
+  // dis_X = X;
+  // dis_Y = Y;
+  // num = block_num;
+  // if(num == 0){
+  //   if(data_on[24] == 1 && data_on[25] == 1){
+  //     dis_Y = 0;
+  //     dis_X = 1;
+  //     num = 1;
+  //   }
+  //   else if(data_on[24] == 1){
+  //     dis_Y = -1;
+  //     dis_X = 0;
+  //     num = 1;
+  //   }
+  //   else if(data_on[25] == 1){
+  //     dis_Y = 1;
+  //     dis_X = 0;
+  //     num = 1;
+  //   }
+  // }
+
+  // if(num == 0){
+  //   LINE_on = 0;
+  // }
+  // else{
+  //   LINE_on = 1;
+  // }
+  
+  // line_sub = 0;
 }
