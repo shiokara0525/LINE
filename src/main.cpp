@@ -7,8 +7,7 @@ int LED = 13;
 int LED_L = 5;
 int FD[24] = {69,22,24,23,25,26,27,28,29,11,12,14,56,57,58,59,60,61,62,63,64,65,66,67};
 int com = 2;
-int th = 22;
-
+int th = 5;  //閾値
 float dis_X;
 float dis_Y;
 uint8_t num;
@@ -112,8 +111,10 @@ void getLine(){
     else{
       data_on[i] = 0;
     }
-    // Serial.print(data_on[i]);
-    // Serial.print(" ");
+    if(Serial){
+      Serial.print(data_on[i]);
+      Serial.print(" ");
+    }
   }
 
   line_byte_[0] = data_on[0] | data_on[1] << 1 | data_on[2] << 2 |data_on[3] << 3 | data_on[4] << 4 |data_on[5] << 5 |data_on[6] << 6 | data_on[7] << 7;
@@ -142,78 +143,8 @@ void getLine(){
     }
   }
 
-  for(int i = 0; i < 27; i++){
-    Serial.print(hoge[i]);
-  }
+  // for(int i = 0; i < 27; i++){
+  //   Serial.print(hoge[i]);
+  // }
   Serial.println();
-  // for(int i = 0; i < 24; i++){
-  //   if(2 <= i && i <= 4){
-  //     continue;
-  //   }
-  //   if(flag == 0){
-  //     if(data_on[i] == 1){
-  //       block_num++;
-  //       block_first[block_num] = i;
-  //       flag = 1;
-  //     }
-  //   }
-  //   else{
-  //     if(data_on[i] == 0){
-  //       block_last[block_num] = i - 1;
-  //       flag = 0;
-  //     }
-  //   }
-
-  //   if(i == 23){
-  //     if(data_on[23] == 1 && data_on[0] == 1){
-  //       block_first[0] = block_first[block_num];
-  //       block_first[block_num] = 0;
-  //       block_num--;
-  //     }
-
-  //     if(data_on[23] == 1 && data_on[0] == 0){
-  //       block_last[block_num] = 23;
-  //     }
-  //   }
-  // }
-
-  // for(int i = 0; i <= block_num; i++){
-  //   block_X[i] = ele_X[block_first[i]] + ele_X[block_last[i]];
-  //   block_Y[i] = ele_Y[block_first[i]] + ele_Y[block_last[i]];
-  //   X += block_X[i];
-  //   Y += block_Y[i];
-  // }
-  // block_num++;
-
-  // X /= block_num;
-  // Y /= block_num;
-  // dis_X = X;
-  // dis_Y = Y;
-  // num = block_num;
-  // if(num == 0){
-  //   if(data_on[24] == 1 && data_on[25] == 1){
-  //     dis_Y = 0;
-  //     dis_X = 1;
-  //     num = 1;
-  //   }
-  //   else if(data_on[24] == 1){
-  //     dis_Y = -1;
-  //     dis_X = 0;
-  //     num = 1;
-  //   }
-  //   else if(data_on[25] == 1){
-  //     dis_Y = 1;
-  //     dis_X = 0;
-  //     num = 1;
-  //   }
-  // }
-
-  // if(num == 0){
-  //   LINE_on = 0;
-  // }
-  // else{
-  //   LINE_on = 1;
-  // }
-  
-  // line_sub = 0;
 }
