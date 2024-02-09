@@ -7,7 +7,7 @@ int LED = 13;
 int LED_L = 5;
 int FD[24] = {69,22,24,23,25,26,27,28,29,11,12,14,56,57,58,59,60,61,62,63,64,65,66,67};
 int com = 2;
-int th = 5;  //閾値
+int th = 20;  //閾値
 float dis_X;
 float dis_Y;
 uint8_t num;
@@ -75,8 +75,8 @@ void getLine(){
   uint8_t L_bit[27];
   L_bit[0] = PINK & _BV(7);
   L_bit[1] = PINA & _BV(0);
-  L_bit[2] = PINA & _BV(1);
-  L_bit[3] = PINA & _BV(2);
+  L_bit[2] = PINA & _BV(2);
+  L_bit[3] = PINA & _BV(1);
   L_bit[4] = PINA & _BV(3);
   L_bit[5] = PINA & _BV(4);
   L_bit[6] = PINA & _BV(5);
