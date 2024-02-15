@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include<timer.h>
 
 #define Long 5
 
@@ -7,13 +8,16 @@ int LED = 13;
 int LED_L = 5;
 int FD[24] = {69,22,24,23,25,26,27,28,29,11,12,14,56,57,58,59,60,61,62,63,64,65,66,67};
 int com = 2;
-int th = 20;  //閾値
+int th = 23;  //閾値
 float dis_X;
 float dis_Y;
 uint8_t num;
 byte send[6];
 uint8_t line_sub = 0;
 byte line_byte[4];
+timer time;
+timer time_2;
+int sawa[2];
 int LINE_on;
 double ele_X[27]; //ラインセンサのX座標
 double ele_Y[27]; //ラインセンサのY座標
@@ -21,7 +25,7 @@ void getLine();
 
 void setup() {
   Serial.begin(9600);
-  Serial2.begin(57600);
+  Serial2.begin(115200);
   pinMode(LED_L,OUTPUT);
   for(int i = 0; i < 24; i++){
     ele_Y[i] = sin(radians(15 * i));
@@ -36,10 +40,9 @@ void setup() {
 
 
 void loop() {
-  digitalWrite(LED_L,HIGH);
+  PORTE |= _BV(3);
   getLine();
-  digitalWrite(LED_L,LOW);
-
+  PORTE &= ~_BV(3);
   // Serial.print(" | ");
   // Serial.print(vec[0]);
   // Serial.print(" ");
@@ -47,7 +50,6 @@ void loop() {
   // Serial.print(" ang : ");
   // Serial.print(degrees(atan2(vec[1],vec[0])));
   // Serial.println();
-
   send[0] = 38;
   send[1] = line_byte[0];
   send[2] = line_byte[1];
@@ -55,12 +57,12 @@ void loop() {
   send[4] = line_byte[3];
   send[5] = 37;
   if(num != 0){
-    digitalWrite(LED,HIGH);
+    PORTB |= _BV(7);
   }
   else{
-    digitalWrite(LED,LOW);
+    PORTB &= ~_BV(7);
   }
-
+  
   Serial2.write(send,6);
 }
 
@@ -104,18 +106,19 @@ void getLine(){
   for(int i = 0; i < 27; i++){
     if(L_bit[i] != 0){
       data_on[i] = 1;
-      if(i < 24){
+      if(i != 17 && i != 26){
         num++;
       }
     }
     else{
       data_on[i] = 0;
     }
-    if(Serial){
-      Serial.print(data_on[i]);
-      Serial.print(" ");
-    }
   }
+
+  // for(int i = 0; i < 27; i++){
+  //   Serial.print(data_on[i]);
+  //   Serial.print(" ");
+  // }
 
   line_byte_[0] = data_on[0] | data_on[1] << 1 | data_on[2] << 2 |data_on[3] << 3 | data_on[4] << 4 |data_on[5] << 5 |data_on[6] << 6 | data_on[7] << 7;
   line_byte_[1] = data_on[8] | data_on[9] << 1 | data_on[10] << 2 | data_on[11] << 3 | data_on[12] << 4 | data_on[13] << 5 | data_on[14] << 6 | data_on[15] << 7;
@@ -132,19 +135,6 @@ void getLine(){
   line_byte[1] = line_byte_[1];
   line_byte[2] = line_byte_[2];
   line_byte[3] = line_byte_[3];
-  
-  for(int i = 0; i < 4; i++){
-    for(int j = 0; j < 8; j++){
-      hoge[i * 8 + j] = line_byte_[i] % 2;
-      line_byte_[i] /= 2;
-      if(i == 3 && 2 <= j){
-        break;
-      }
-    }
-  }
-
-  // for(int i = 0; i < 27; i++){
-  //   Serial.print(hoge[i]);
-  // }
+ 
   Serial.println();
 }
