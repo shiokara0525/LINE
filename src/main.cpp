@@ -57,7 +57,7 @@ void loop() {
   }
   
   Serial2.write(send,6);
-  int a = time.read_ms();
+  // int a = time.read_ms();
   // Serial.print(" time : ");
   // Serial.print(a);
   // for(int i = 0; i < 27; i++){
@@ -106,7 +106,7 @@ void getLine(){
   for(int i = 0; i < 27; i++){
     if(L_bit[i] != 0){
       data_on[i] = 1;
-      if(i != 6 && i != 20 && i != 23 && i != 25){
+      if(i != 26){
         num++;
       }
     }
