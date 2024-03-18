@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include<timer.h>
+#include<EEPROM.h>
 
 #define Long 5
 
@@ -8,8 +9,9 @@ int LED = 13;
 int LED_L = 5;
 int FD[24] = {69,22,24,23,25,26,27,28,29,11,12,14,56,57,58,59,60,61,62,63,64,65,66,67};
 int com = 2;
-int th = 10;  //閾値
+int th = 20;  //閾値
 int print_data[27];
+int address = 0x00;
 
 uint8_t num;
 byte send[6];
@@ -21,6 +23,8 @@ timer time_2;
 void getLine();
 
 void setup() {
+  EEPROM.begin();
+  EEPROM.get(address,th);
   Serial.begin(9600);
   Serial2.begin(115200);
   pinMode(LED_L,OUTPUT);
@@ -60,10 +64,31 @@ void loop() {
   // int a = time.read_ms();
   // Serial.print(" time : ");
   // Serial.print(a);
-  // for(int i = 0; i < 27; i++){
+  // for(int i = 0; i < 24; i++){
   //   Serial.print(" ");
   //   Serial.print(print_data[i]);
   // }
+  Serial.print(th);
+  if(4 <= Serial2.available()){
+    uint8_t read[4];
+    read[0] = Serial2.read();
+    if(read[0] == 38){
+      for(int i = 1; i < 4; i++){
+        read[i] = Serial2.read();
+      }
+      while(Serial2.available()){
+        Serial2.read();
+      }
+
+      if(read[0] == 38 && read[3] == 37){
+        if(read[1] == 0){
+          th = read[2];
+          analogWrite(com,th);
+          EEPROM.put(address,th);
+        }
+      }
+    }
+  }
   Serial.println();
 }
 
@@ -126,4 +151,33 @@ void getLine(){
   line_byte[1] = line_byte_[1];
   line_byte[2] = line_byte_[2];
   line_byte[3] = line_byte_[3];
+}
+
+
+
+
+void serial2Event(){
+  Serial.print("!!!!!!!!!!!!");
+  uint8_t read[4];
+  if(Serial2.available() < 4){
+    return;
+  }
+  read[0] = Serial2.read();
+  if(read[0] != 38){
+    return;
+  }
+
+  for(int i = 1; i < 4; i++){
+    read[i] = Serial2.read();
+  }
+  while(Serial2.available()){
+    Serial2.read();
+  }
+
+  if(read[0] == 38 && read[3] == 37){
+    if(read[1] == 0){
+      th = read[2];
+      Serial.println(th);
+    }
+  }
 }
