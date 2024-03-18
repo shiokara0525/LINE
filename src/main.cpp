@@ -68,7 +68,7 @@ void loop() {
   //   Serial.print(" ");
   //   Serial.print(print_data[i]);
   // }
-  Serial.print(th);
+  // Serial.print(th);
   if(4 <= Serial2.available()){
     uint8_t read[4];
     read[0] = Serial2.read();
@@ -157,7 +157,6 @@ void getLine(){
 
 
 void serial2Event(){
-  Serial.print("!!!!!!!!!!!!");
   uint8_t read[4];
   if(Serial2.available() < 4){
     return;
@@ -177,7 +176,6 @@ void serial2Event(){
   if(read[0] == 38 && read[3] == 37){
     if(read[1] == 0){
       th = read[2];
-      Serial.println(th);
     }
   }
 }
