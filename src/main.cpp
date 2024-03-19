@@ -25,6 +25,7 @@ void getLine();
 void setup() {
   EEPROM.begin();
   EEPROM.get(address,th);
+  th = 20;
   Serial.begin(9600);
   Serial2.begin(115200);
   pinMode(LED_L,OUTPUT);
@@ -64,11 +65,14 @@ void loop() {
   // int a = time.read_ms();
   // Serial.print(" time : ");
   // Serial.print(a);
-  // for(int i = 0; i < 24; i++){
+  // for(int i = 0; i < 27; i++){
   //   Serial.print(" ");
   //   Serial.print(print_data[i]);
   // }
+
+  // Serial.print(" ");
   // Serial.print(th);
+
   if(4 <= Serial2.available()){
     uint8_t read[4];
     read[0] = Serial2.read();
