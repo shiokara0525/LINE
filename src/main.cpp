@@ -90,6 +90,9 @@ void loop() {
           analogWrite(com,th);
           EEPROM.put(address,th);
         }
+        else if(read[1] == 10){
+          digitalWrite(LED_L,read[2]);
+        }
       }
     }
   }
