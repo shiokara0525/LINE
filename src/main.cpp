@@ -25,7 +25,6 @@ void getLine();
 void setup() {
   EEPROM.begin();
   EEPROM.get(address,th);
-  th = 20;
   Serial.begin(9600);
   Serial2.begin(115200);
   pinMode(LED_L,OUTPUT);
